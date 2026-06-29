@@ -92,33 +92,67 @@
         <!-- Section 1: Overview -->
         <div class="mb-10">
             <h2 class="text-xl font-bold text-obec-dark border-l-4 border-obec-green pl-3 mb-6">ภาพรวมระดับเขตพื้นที่</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Card 1 -->
-                <div class="bg-white rounded-2xl p-6 flex items-center border border-gray-100 card-hover">
-                    <div class="w-16 h-16 shrink-0 bg-emerald-100 rounded-full flex items-center justify-center mr-4">
-                        <i class="fas fa-school text-3xl text-obec-green"></i>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Card 1: โรงเรียนที่รายงาน -->
+                <div class="bg-white rounded-2xl p-6 flex flex-col justify-center border border-gray-100 card-hover min-h-[220px]">
+                    <div class="flex items-center">
+                        <div class="w-16 h-16 shrink-0 bg-emerald-100 rounded-full flex items-center justify-center mr-4">
+                            <i class="fas fa-school text-3xl text-obec-green"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 font-medium mb-1">จำนวนโรงเรียนที่รายงาน</p>
+                            <h3 class="text-3xl font-bold text-gray-800">
+                                <span class="counter" id="count-schools" data-target="4">0</span> 
+                                <span class="text-lg font-normal text-gray-500">แห่ง</span>
+                            </h3>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-sm text-gray-500 font-medium mb-1">จำนวนโรงเรียนที่รายงาน</p>
-                        <h3 class="text-3xl font-bold text-gray-800">
-                            <!-- ปรับข้อมูลเริ่มต้นเป็น 4 ตามรูปภาพชีตจริงของคุณ -->
-                            <span class="counter" id="count-schools" data-target="4">0</span> 
-                            <span class="text-lg font-normal text-gray-500">แห่ง</span>
-                        </h3>
+                    <div class="border-t border-gray-100 pt-4 mt-6">
+                        <p class="text-xs text-gray-400 font-medium"><i class="fas fa-info-circle mr-1"></i> อ้างอิงตามจำนวนสถานศึกษาในสังกัดจริงที่ส่งข้อมูลรายงาน</p>
                     </div>
                 </div>
-                <!-- Card 2 -->
-                <div class="bg-white rounded-2xl p-6 flex items-center border border-gray-100 card-hover">
-                    <div class="w-16 h-16 shrink-0 bg-teal-100 rounded-full flex items-center justify-center mr-4">
-                        <i class="fas fa-network-wired text-3xl text-teal-600"></i>
+
+                <!-- Card 2: เครือข่ายการศึกษา (แบบแจกแจงรายละเอียด) -->
+                <div class="bg-white rounded-2xl p-6 border border-gray-100 card-hover flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <div class="w-16 h-16 shrink-0 bg-teal-100 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-network-wired text-3xl text-teal-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 font-medium mb-1">เครือข่ายการศึกษาที่รายงานแล้ว</p>
+                                <h3 class="text-3xl font-bold text-gray-800">
+                                    <span class="counter" id="count-networks" data-target="4">0</span> 
+                                    <span class="text-lg font-normal text-gray-500">เครือข่าย</span>
+                                </h3>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-sm text-gray-500 font-medium mb-1">เครือข่ายการศึกษาที่รายงานแล้ว</p>
-                        <h3 class="text-3xl font-bold text-gray-800">
-                            <!-- ปรับข้อมูลเริ่มต้นเป็น 4 ตามรูปภาพชีตจริงของคุณ -->
-                            <span class="counter" id="count-networks" data-target="4">0</span> 
-                            <span class="text-lg font-normal text-gray-500">เครือข่าย</span>
-                        </h3>
+                    
+                    <!-- รายชื่อเครือข่ายย่อยที่รายงานเข้ามาจริง -->
+                    <div class="border-t border-gray-100 pt-3">
+                        <p class="text-xs font-semibold text-obec-green mb-2 uppercase tracking-wider">
+                            <i class="fas fa-list-ul mr-1"></i> รายชื่อเครือข่ายและสัดส่วนที่รายงานแล้ว
+                        </p>
+                        <div id="network-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm max-h-[140px] overflow-y-auto pr-1">
+                            <!-- แสดงค่าเริ่มต้น 4 โรงเรียนจริงที่อยู่ในชีตก่อนเชื่อมต่อ API -->
+                            <div class="flex justify-between items-center bg-emerald-50/50 p-2 rounded-lg border border-emerald-100/50">
+                                <span class="text-gray-700 font-medium truncate"><i class="fas fa-circle-notch text-emerald-500 text-xs mr-2"></i>เครือข่ายสุนทรภู่</span>
+                                <span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full text-xs font-semibold shrink-0">1 รร.</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-emerald-50/50 p-2 rounded-lg border border-emerald-100/50">
+                                <span class="text-gray-700 font-medium truncate"><i class="fas fa-circle-notch text-emerald-500 text-xs mr-2"></i>เครือข่ายมิตรภาพวังหว้า</span>
+                                <span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full text-xs font-semibold shrink-0">1 รร.</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-emerald-50/50 p-2 rounded-lg border border-emerald-100/50">
+                                <span class="text-gray-700 font-medium truncate"><i class="fas fa-circle-notch text-emerald-500 text-xs mr-2"></i>เครือข่ายชากโดน</span>
+                                <span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full text-xs font-semibold shrink-0">1 รร.</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-emerald-50/50 p-2 rounded-lg border border-emerald-100/50">
+                                <span class="text-gray-700 font-medium truncate"><i class="fas fa-circle-notch text-emerald-500 text-xs mr-2"></i>เครือข่ายวังจันทร์</span>
+                                <span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full text-xs font-semibold shrink-0">1 รร.</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -330,6 +364,26 @@
                         if (data.bp_creators) document.getElementById('count-bp-creators').setAttribute('data-target', data.bp_creators);
                         if (data.bp_users) document.getElementById('count-bp-users').setAttribute('data-target', data.bp_users);
                         if (data.bp_drivers) document.getElementById('count-bp-drivers').setAttribute('data-target', data.bp_drivers);
+
+                        // อัปเดตรายชื่อเครือข่ายและสัดส่วนจำนวนโรงเรียนที่ส่งในแต่ละเครือข่าย
+                        if (data.networks_breakdown) {
+                            const networkListContainer = document.getElementById('network-list');
+                            networkListContainer.innerHTML = ''; // ล้างข้อมูลตัวอย่างเดิมออกทั้งหมด
+                            
+                            Object.entries(data.networks_breakdown).forEach(([networkName, schoolCount]) => {
+                                const itemHtml = `
+                                    <div class="flex justify-between items-center bg-emerald-50/50 p-2 rounded-lg border border-emerald-100/50 transition hover:bg-emerald-50">
+                                        <span class="text-gray-700 font-medium truncate">
+                                            <i class="fas fa-circle-notch text-emerald-500 text-xs mr-2"></i>${networkName}
+                                        </span>
+                                        <span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full text-xs font-semibold shrink-0">
+                                            ${schoolCount} รร.
+                                        </span>
+                                    </div>
+                                `;
+                                networkListContainer.insertAdjacentHTML('beforeend', itemHtml);
+                            });
+                        }
 
                         statusBadge.className = "mb-6 p-4 rounded-xl text-sm font-medium text-center bg-emerald-50 text-emerald-700 border border-emerald-100";
                         statusBadge.innerHTML = '<i class="fas fa-check-circle mr-2"></i> ข้อมูลเชื่อมต่อกับ Google Sheets สำเร็จและอัปเดตล่าสุดแล้ว!';
