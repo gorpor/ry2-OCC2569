@@ -86,6 +86,9 @@
     <!-- Main Content -->
     <main class="flex-grow container mx-auto px-4 py-10">
         
+        <!-- API Connection Status Badge (Hidden by default, shown when connecting) -->
+        <div id="connection-status" class="hidden mb-6 p-4 rounded-xl text-sm font-medium text-center"></div>
+
         <!-- Section 1: Overview -->
         <div class="mb-10">
             <h2 class="text-xl font-bold text-obec-dark border-l-4 border-obec-green pl-3 mb-6">ภาพรวมระดับเขตพื้นที่</h2>
@@ -97,7 +100,11 @@
                     </div>
                     <div>
                         <p class="text-sm text-gray-500 font-medium mb-1">จำนวนโรงเรียนที่รายงาน</p>
-                        <h3 class="text-3xl font-bold text-gray-800"><span class="counter" data-target="95">0</span> <span class="text-lg font-normal text-gray-500">แห่ง</span></h3>
+                        <h3 class="text-3xl font-bold text-gray-800">
+                            <!-- ปรับข้อมูลเริ่มต้นเป็น 4 ตามรูปภาพชีตจริงของคุณ -->
+                            <span class="counter" id="count-schools" data-target="4">0</span> 
+                            <span class="text-lg font-normal text-gray-500">แห่ง</span>
+                        </h3>
                     </div>
                 </div>
                 <!-- Card 2 -->
@@ -107,7 +114,11 @@
                     </div>
                     <div>
                         <p class="text-sm text-gray-500 font-medium mb-1">เครือข่ายการศึกษาที่รายงานแล้ว</p>
-                        <h3 class="text-3xl font-bold text-gray-800"><span class="counter" data-target="8">0</span> <span class="text-lg font-normal text-gray-500">เครือข่าย</span></h3>
+                        <h3 class="text-3xl font-bold text-gray-800">
+                            <!-- ปรับข้อมูลเริ่มต้นเป็น 4 ตามรูปภาพชีตจริงของคุณ -->
+                            <span class="counter" id="count-networks" data-target="4">0</span> 
+                            <span class="text-lg font-normal text-gray-500">เครือข่าย</span>
+                        </h3>
                     </div>
                 </div>
             </div>
@@ -127,7 +138,7 @@
                         <h3 class="font-semibold text-gray-700 leading-tight">ผู้บริหารสถานศึกษา<br>ที่เข้าใช้งาน</h3>
                     </div>
                     <div class="text-right">
-                        <span class="text-4xl font-bold text-blue-600 counter" data-target="82">0</span>
+                        <span class="text-4xl font-bold text-blue-600 counter" id="count-execs" data-target="4">0</span>
                         <span class="text-gray-500">คน</span>
                     </div>
                 </div>
@@ -141,7 +152,7 @@
                         <h3 class="font-semibold text-gray-700 leading-tight">ครูและบุคลากรฯ<br>ที่เข้าใช้งาน</h3>
                     </div>
                     <div class="text-right">
-                        <span class="text-4xl font-bold text-orange-600 counter" data-target="1254">0</span>
+                        <span class="text-4xl font-bold text-orange-600 counter" id="count-teachers" data-target="15">0</span>
                         <span class="text-gray-500">คน</span>
                     </div>
                 </div>
@@ -155,7 +166,7 @@
                         <h3 class="font-semibold text-gray-700 leading-tight">นักเรียน<br>ที่เข้าใช้งาน</h3>
                     </div>
                     <div class="text-right">
-                        <span class="text-4xl font-bold text-pink-600 counter" data-target="15890">0</span>
+                        <span class="text-4xl font-bold text-pink-600 counter" id="count-students" data-target="120">0</span>
                         <span class="text-gray-500">คน</span>
                     </div>
                 </div>
@@ -179,7 +190,7 @@
                         </div>
                     </div>
                     <div class="text-right pl-4">
-                        <span class="text-3xl font-bold text-emerald-600 counter" data-target="345">0</span>
+                        <span class="text-3xl font-bold text-emerald-600 counter" id="count-creators" data-target="6">0</span>
                         <span class="text-gray-500 text-sm block">คน</span>
                     </div>
                 </div>
@@ -194,7 +205,7 @@
                         </div>
                     </div>
                     <div class="text-right pl-4">
-                        <span class="text-3xl font-bold text-cyan-600 counter" data-target="2108">0</span>
+                        <span class="text-3xl font-bold text-cyan-600 counter" id="count-users" data-target="28">0</span>
                         <span class="text-gray-500 text-sm block">คน</span>
                     </div>
                 </div>
@@ -209,7 +220,7 @@
                         <i class="fas fa-medal"></i>
                     </div>
                     <h4 class="text-sm font-semibold text-gray-600 mb-2 mt-2">จำนวน Best Practice<br><span class="text-amber-600">ผู้สร้างสื่อฯ</span> ของโรงเรียน</h4>
-                    <span class="text-3xl font-bold text-gray-800 counter" data-target="45">0</span> <span class="text-gray-500 text-sm">ผลงาน</span>
+                    <span class="text-3xl font-bold text-gray-800 counter" id="count-bp-creators" data-target="2">0</span> <span class="text-gray-500 text-sm">ผลงาน</span>
                 </div>
                 <!-- BP Card 2 -->
                 <div class="bg-white rounded-2xl p-5 border border-purple-100 card-hover text-center relative pt-8">
@@ -217,7 +228,7 @@
                         <i class="fas fa-star"></i>
                     </div>
                     <h4 class="text-sm font-semibold text-gray-600 mb-2 mt-2">จำนวน Best Practice<br><span class="text-purple-600">ผู้ใช้สื่อฯ</span> ของโรงเรียน</h4>
-                    <span class="text-3xl font-bold text-gray-800 counter" data-target="86">0</span> <span class="text-gray-500 text-sm">ผลงาน</span>
+                    <span class="text-3xl font-bold text-gray-800 counter" id="count-bp-users" data-target="3">0</span> <span class="text-gray-500 text-sm">ผลงาน</span>
                 </div>
                 <!-- BP Card 3 -->
                 <div class="bg-white rounded-2xl p-5 border border-rose-100 card-hover text-center relative pt-8">
@@ -225,7 +236,7 @@
                         <i class="fas fa-trophy"></i>
                     </div>
                     <h4 class="text-sm font-semibold text-gray-600 mb-2 mt-2">จำนวน Best Practice<br><span class="text-rose-600">ผู้ขับเคลื่อนระบบ OCC</span> (สถานศึกษา)</h4>
-                    <span class="text-3xl font-bold text-gray-800 counter" data-target="15">0</span> <span class="text-gray-500 text-sm">แห่ง</span>
+                    <span class="text-3xl font-bold text-gray-800 counter" id="count-bp-drivers" data-target="1">0</span> <span class="text-gray-500 text-sm">แห่ง</span>
                 </div>
             </div>
         </div>
@@ -263,7 +274,7 @@
         </div>
     </footer>
 
-    <!-- Script for Number Counting Animation -->
+    <!-- Script for Number Counting Animation and Live Sheet Integration -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const counters = document.querySelectorAll('.counter');
@@ -289,14 +300,55 @@
                 });
             };
 
-            // เรียกใช้ animation ทันทีเมื่อโหลดหน้าเว็บ
-            animateCounters();
-            
-            /* * หมายเหตุสำหรับการเชื่อมต่อกับ Google Sheets:
-             * หากต้องการให้ตัวเลขเหล่านี้เปลี่ยนแปลงตาม Google Sheets อัตโนมัติ 
-             * คุณสามารถเขียนฟังก์ชัน Fetch ไปยัง API ที่สร้างจาก Google Apps Script (Web App)
-             * แล้วนำค่ามาอัปเดตใส่ attribute 'data-target' ของแต่ละช่อง ก่อนเรียกใช้ animateCounters()
-             */
+            // ==========================================
+            // 🔗 การเชื่อมต่อข้อมูลสดกับ Google Sheets (แบบอัตโนมัติ)
+            // ==========================================
+            // วาง URL ของ Google Apps Script Web App ที่ Deploy มาจาก Google Sheets ของท่านลงในฟันหนูใต้บรรทัดนี้:
+            const GOOGLE_SHEETS_API_URL = "https://script.google.com/macros/s/AKfycby4Pn5xf_a4DL6Rxylaf4SpOQuizd8Rsv2TPBUIjXgpLxcE4nJfVF3xM1pDvUIvBEGCNw/exec"; 
+
+            if (GOOGLE_SHEETS_API_URL) {
+                const statusBadge = document.getElementById('connection-status');
+                statusBadge.classList.remove('hidden');
+                statusBadge.className = "mb-6 p-4 rounded-xl text-sm font-medium text-center bg-blue-50 text-blue-700 border border-blue-100";
+                statusBadge.innerHTML = '<i class="fas fa-sync fa-spin mr-2"></i> กำลังอัปเดตข้อมูลสดแบบเรียลไทม์จาก Google Sheets...';
+
+                // เรียกใช้ Fetch API ดึงข้อมูล
+                fetch(GOOGLE_SHEETS_API_URL)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
+                    })
+                    .then(data => {
+                        // แมปปิ้งข้อมูลจาก API มาใส่ Attribute data-target ของระบบ
+                        if (data.schools) document.getElementById('count-schools').setAttribute('data-target', data.schools);
+                        if (data.networks) document.getElementById('count-networks').setAttribute('data-target', data.networks);
+                        if (data.execs) document.getElementById('count-execs').setAttribute('data-target', data.execs);
+                        if (data.teachers) document.getElementById('count-teachers').setAttribute('data-target', data.teachers);
+                        if (data.students) document.getElementById('count-students').setAttribute('data-target', data.students);
+                        if (data.creators) document.getElementById('count-creators').setAttribute('data-target', data.creators);
+                        if (data.users) document.getElementById('count-users').setAttribute('data-target', data.users);
+                        if (data.bp_creators) document.getElementById('count-bp-creators').setAttribute('data-target', data.bp_creators);
+                        if (data.bp_users) document.getElementById('count-bp-users').setAttribute('data-target', data.bp_users);
+                        if (data.bp_drivers) document.getElementById('count-bp-drivers').setAttribute('data-target', data.bp_drivers);
+
+                        statusBadge.className = "mb-6 p-4 rounded-xl text-sm font-medium text-center bg-emerald-50 text-emerald-700 border border-emerald-100";
+                        statusBadge.innerHTML = '<i class="fas fa-check-circle mr-2"></i> ข้อมูลเชื่อมต่อกับ Google Sheets สำเร็จและอัปเดตล่าสุดแล้ว!';
+                        
+                        // เริ่มต้น Animation หลังจากอัปเดตค่าจาก API แล้ว
+                        animateCounters();
+                    })
+                    .catch(error => {
+                        console.error('Error fetching dynamic data:', error);
+                        statusBadge.className = "mb-6 p-4 rounded-xl text-sm font-medium text-center bg-amber-50 text-amber-700 border border-amber-100";
+                        statusBadge.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i> ไม่สามารถเชื่อมต่อฐานข้อมูลชีตได้ (กำลังแสดงผลข้อมูลล่าสุดแบบ Static ในระบบ)';
+                        
+                        // หากมีปัญหา ให้รันตัวเลข Fallback ล่าสุดที่ระบุไว้ใน HTML
+                        animateCounters();
+                    });
+            } else {
+                // หากยังไม่ได้ใส่ API URL ให้ทำการรันข้อมูลตัวเลข Mock ปกติที่ป้อนไว้
+                animateCounters();
+            }
         });
     </script>
 </body>
