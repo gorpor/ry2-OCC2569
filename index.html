@@ -236,33 +236,16 @@
     </footer>
 
     <!-- Application Script -->
+    <!-- เพิ่มไลบรารี PapaParse สำหรับอ่านไฟล์ CSV จาก Google Sheet -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script>
-        // ข้อมูลตัวอย่างจากการตอบแบบฟอร์ม (ปรับแต่งเพื่อแสดงเป็น Dashboard)
-        const rawData = [
-            { school: "โรงเรียนบ้านพลงตาเอี่ยม", network: "วังจันทร์", level: "ปฐมวัย, ประถมศึกษา, มัธยมศึกษาตอนต้น", admin_occ: 2, teacher_occ: 17, creator: 98, user: 17, bp_creator: 98, bp_user: 17, bp_school: 17 },
-            { school: "โรงเรียนบ้านเจริญสุข", network: "อริยมงคล", level: "ปฐมวัย, ประถมศึกษา", admin_occ: 1, teacher_occ: 13, creator: 84, user: 0, bp_creator: 13, bp_user: 0, bp_school: 0 },
-            { school: "โรงเรียนบ้านเต้าปูนหาย", network: "สุนทรภู่", level: "ปฐมวัย, ประถมศึกษา", admin_occ: 1, teacher_occ: 7, creator: 25, user: 1, bp_creator: 7, bp_user: 0, bp_school: 1 },
-            { school: "โรงเรียนบ้านเหมืองแร่", network: "เขาชะเมา", level: "ปฐมวัย, ประถมศึกษา", admin_occ: 1, teacher_occ: 4, creator: 4, user: 1, bp_creator: 3, bp_user: 3, bp_school: 0 },
-            { school: "โรงเรียนบ้านท่าลำบิด", network: "แกลงบูรพา", level: "ประถมศึกษา", admin_occ: 1, teacher_occ: 9, creator: 30, user: 2, bp_creator: 9, bp_user: 0, bp_school: 0 },
-            { school: "โรงเรียนชุมชนวัดกลางกร่ำ", network: "สุนทรภู่", level: "ปฐมวัย, ประถมศึกษา", admin_occ: 2, teacher_occ: 29, creator: 77, user: 3, bp_creator: 26, bp_user: 1, bp_school: 7 },
-            { school: "โรงเรียนบ้านคลองป่าไม้", network: "แกลงบูรพา", level: "ปฐมวัย, ประถมศึกษา, มัธยมศึกษาตอนต้น", admin_occ: 1, teacher_occ: 16, creator: 144, user: 16, bp_creator: 16, bp_user: 2, bp_school: 8 },
-            { school: "โรงเรียนบ้านยุบตาเหน่ง", network: "วังจันทร์", level: "ปฐมวัย, ประถมศึกษา", admin_occ: 1, teacher_occ: 12, creator: 126, user: 0, bp_creator: 13, bp_user: 0, bp_school: 0 },
-            { school: "โรงเรียนวัดท่ากง", network: "กรมหลวงชุมพรฯ", level: "ประถมศึกษา", admin_occ: 1, teacher_occ: 10, creator: 0, user: 1, bp_creator: 1, bp_user: 1, bp_school: 1 },
-            { school: "โรงเรียนวัดสมอโพรง", network: "สุนทรภู่", level: "ปฐมวัย, ประถมศึกษา", admin_occ: 1, teacher_occ: 8, creator: 0, user: 0, bp_creator: 8, bp_user: 0, bp_school: 0 },
-            { school: "โรงเรียนบ้านมาบช้างนอน", network: "เขาชะเมา", level: "ปฐมวัย, ประถมศึกษา", admin_occ: 0, teacher_occ: 6, creator: 15, user: 0, bp_creator: 6, bp_user: 0, bp_school: 0 },
-            { school: "โรงเรียนบ้านมะเดื่อ", network: "เขาชะเมา", level: "ประถมศึกษา, มัธยมศึกษาตอนต้น", admin_occ: 1, teacher_occ: 17, creator: 138, user: 17, bp_creator: 17, bp_user: 17, bp_school: 0 },
-            { school: "โรงเรียนวัดจำรุง", network: "สุนทรภู่", level: "ปฐมวัย, ประถมศึกษา", admin_occ: 1, teacher_occ: 4, creator: 11, user: 1, bp_creator: 4, bp_user: 0, bp_school: 0 },
-            { school: "โรงเรียนบ้านสองสลึง", network: "สุนทรภู่", level: "ประถมศึกษา, มัธยมศึกษาตอนต้น", admin_occ: 2, teacher_occ: 16, creator: 225, user: 16, bp_creator: 16, bp_user: 0, bp_school: 0 },
-            { school: "โรงเรียนไทยรัฐวิทยา ๔๓", network: "วังจันทร์", level: "ปฐมวัย, ประถมศึกษา, มัธยมศึกษาตอนต้น", admin_occ: 1, teacher_occ: 16, creator: 60, user: 3, bp_creator: 16, bp_user: 3, bp_school: 0 },
-            { school: "โรงเรียนวัดชากมะกรูด", network: "สุนทรภู่", level: "ปฐมวัย, ประถมศึกษา", admin_occ: 1, teacher_occ: 1, creator: 0, user: 0, bp_creator: 1, bp_user: 0, bp_school: 0 },
-            { school: "โรงเรียนวัดไตรรัตนาราม", network: "กรมหลวงชุมพรฯ", level: "ปฐมวัย, ประถมศึกษา", admin_occ: 1, teacher_occ: 8, creator: 0, user: 0, bp_creator: 8, bp_user: 0, bp_school: 0 },
-            { school: "โรงเรียนชุมชนบ้านวังจันทน์", network: "วังจันทร์", level: "ปฐมวัย, ประถมศึกษา, มัธยมศึกษาตอนต้น", admin_occ: 1, teacher_occ: 16, creator: 60, user: 3, bp_creator: 16, bp_user: 1, bp_school: 0 },
-            { school: "โรงเรียนบ้านเนินดินแดง", network: "อริยมงคล", level: "ปฐมวัย, ประถมศึกษา", admin_occ: 1, teacher_occ: 5, creator: 10, user: 0, bp_creator: 5, bp_user: 0, bp_school: 2 },
-            { school: "โรงเรียนวัดชุมนุมสูง", network: "แกลงบูรพา", level: "ปฐมวัย, ประถมศึกษา", admin_occ: 1, teacher_occ: 5, creator: 53, user: 5, bp_creator: 3, bp_user: 0, bp_school: 0 },
-            { school: "โรงเรียนวัดพลงช้างเผือก", network: "อริยมงคล", level: "ปฐมวัย, ประถมศึกษา", admin_occ: 5, teacher_occ: 102, creator: 0, user: 102, bp_creator: 102, bp_user: 8, bp_school: 0 },
-            { school: "โรงเรียนบ้านคลองทุเรียน", network: "สุนทรภู่", level: "ปฐมวัย, ประถมศึกษา", admin_occ: 1, teacher_occ: 7, creator: 0, user: 6, bp_creator: 7, bp_user: 0, bp_school: 0 }
-        ];
+        // --- ส่วนที่ต้องแก้ไข ---
+        // นำลิงก์ CSV จาก "เผยแพร่ทางเว็บ" มาวางที่นี่
+        // ** ลิงก์ด้านล่างนี้เป็นลิงก์ตัวอย่าง ต้องเปลี่ยนเป็นลิงก์ของคุณเอง **
+        const SHEET_CSV_URL = "YOUR_PUBLISHED_CSV_LINK_HERE"; 
+        // -----------------------
 
+        let rawData = [];
         let charts = {};
 
         // Chart default configs
@@ -273,6 +256,47 @@
         Chart.defaults.plugins.tooltip.titleFont = { size: 14, family: "'Prompt', sans-serif" };
 
         function init() {
+            // แสดงข้อความกำลังโหลด
+            document.getElementById('dataTableBody').innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-spin mr-2"></i>กำลังดึงข้อมูลจากระบบ...</td></tr>';
+            
+            if (SHEET_CSV_URL === "YOUR_PUBLISHED_CSV_LINK_HERE") {
+                 document.getElementById('dataTableBody').innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-red-500 font-bold">กรุณาใส่ลิงก์ CSV ในโค้ดก่อนใช้งาน</td></tr>';
+                 return;
+            }
+
+            // ดึงข้อมูลจาก Google Sheet แบบ CSV
+            Papa.parse(SHEET_CSV_URL, {
+                download: true,
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    processData(results.data);
+                },
+                error: function(err) {
+                    console.error("Error parsing CSV:", err);
+                    document.getElementById('dataTableBody').innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-red-500">เกิดข้อผิดพลาดในการดึงข้อมูล โปรดตรวจสอบลิงก์ CSV</td></tr>';
+                }
+            });
+        }
+
+        function processData(csvData) {
+            rawData = csvData.map(row => {
+                // แปลงข้อมูลจาก CSV ให้อยู่ในรูปแบบที่ระบบต้องการ
+                // สังเกตชื่อ Header ในวงเล็บสี่เหลี่ยม ต้องตรงกับใน Google Sheet ของคุณ
+                return {
+                    school: row["โรงเรียน"] || "ไม่ระบุ",
+                    network: row["เครือข่ายการศึกษา"] || "ไม่ระบุ",
+                    level: row["ระดับการจัดการศึกษา (ตอบได้มากกว่า 1 ข้อ) "] || "",
+                    admin_occ: parseInt(row["จำนวน  ผู้บริหารสถานศึกษา ที่เข้าใช้งาน OCC (ใส่เป็นตัวเลข)"]) || 0,
+                    teacher_occ: parseInt(row["จำนวน ครูและบุคลากรที่ปฏิบัติการสอน  ที่เข้าใช้งาน OCC (ใส่เป็นตัวเลข)"]) || 0,
+                    creator: parseInt(row["จำนวน ผู้สร้างสื่อฯ ลงในระบบ OCC (ใส่เป็นตัวเลข)"]) || 0,
+                    user: parseInt(row["จำนวน ผู้ใช้สื่อฯ จากระบบ OCC (ใส่เป็นตัวเลข)"]) || 0,
+                    bp_creator: parseInt(row["จำนวน Best Practice  ผู้สร้างสื่อฯ ของโรงเรียน (ใส่เป็นตัวเลข)"]) || 0,
+                    bp_user: parseInt(row["จำนวน Best Practice  ผู้ใช้สื่อฯ ของโรงเรียน (ใส่เป็นตัวเลข)"]) || 0,
+                    bp_school: parseInt(row["จำนวน Best Practice ผู้ขับเคลื่อนระบบ OCC ระดับสถานศึกษา (ใส่เป็นตัวเลข)"]) || 0
+                };
+            }).filter(d => d.school !== "ไม่ระบุ"); // กรองแถวที่ว่างออก
+
             populateDropdowns();
             renderDashboard(rawData, "all");
         }
