@@ -3,537 +3,704 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>รายงานผล OBEC Content Center สพป.ระยอง เขต 2</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Google Fonts -->
+    <title>Dashboard รายงานผล OBEC Content Center - สพป.ระยอง เขต 2</title>
+
+    <!-- Google Fonts: Prompt -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Prompt', 'sans-serif'],
+                    },
+                    colors: {
+                        obec: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Chart.js (CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- PapaParse (CDN) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
     <style>
-        body { 
-            font-family: 'Prompt', sans-serif; 
-            background-color: #f0fdf4; /* bg-green-50 */
+        /* Custom Styles เพิ่มเติม */
+        body {
+            background-color: #f8fafc;
         }
-        .card { 
-            background: white; 
-            border-radius: 1rem; 
-            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05); 
-            padding: 1.5rem;
-            transition: transform 0.2s ease-in-out;
+        .card-hover {
+            transition: all 0.3s ease;
         }
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); 
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
-        /* Custom Scrollbar for table */
-        .table-container::-webkit-scrollbar { height: 8px; }
-        .table-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
-        .table-container::-webkit-scrollbar-thumb { background: #22c55e; border-radius: 4px; }
+        /* Loading Overlay */
+        #loading-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #16a34a;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
-<body class="text-gray-800 antialiased">
+<body class="font-sans text-gray-800 antialiased">
 
-    <!-- Banner / Header -->
-    <header class="bg-gradient-to-br from-[#166534] via-[#15803d] to-[#22c55e] text-white shadow-xl relative overflow-hidden">
-        <!-- Abstract Background Elements -->
-        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-white opacity-10"></div>
-        <div class="absolute bottom-0 left-0 -ml-10 -mb-10 w-40 h-40 rounded-full bg-green-200 opacity-20"></div>
+    <!-- Loading Screen -->
+    <div id="loading-overlay">
+        <div class="spinner mb-4"></div>
+        <h2 class="text-xl font-semibold text-obec-700">กำลังโหลดข้อมูลจากระบบ...</h2>
+        <p class="text-gray-500 mt-2">กรุณารอสักครู่</p>
+    </div>
+
+    <!-- Header / Banner -->
+    <header class="bg-gradient-to-r from-obec-700 to-obec-500 text-white pb-12 pt-16 px-4 text-center rounded-b-[3rem] shadow-lg relative overflow-hidden">
+        <!-- Background Decoration -->
+        <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+            <i class="fa-solid fa-cloud-arrow-up text-9xl absolute -top-10 -left-10 transform -rotate-12"></i>
+            <i class="fa-solid fa-laptop-code text-9xl absolute bottom-10 right-10 transform rotate-12"></i>
+        </div>
         
-        <div class="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8 text-center relative z-10">
-            <div class="inline-block p-3 bg-white/20 rounded-2xl backdrop-blur-sm mb-4">
-                <i class="fas fa-desktop text-4xl text-white"></i>
+        <div class="max-w-5xl mx-auto relative z-10">
+            <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-md">
+                <i class="fa-solid fa-chart-pie text-4xl text-obec-600"></i>
             </div>
-            <h1 class="text-2xl md:text-4xl font-bold mb-3 leading-tight drop-shadow-md">
-                รายงานผลการกำกับ ติดตาม ระบบคลังสื่อเทคโนโลยีดิจิทัล<br>
-                <span class="text-green-200 text-xl md:text-3xl font-medium block mt-2">ระดับการศึกษาขั้นพื้นฐาน (OBEC Content Center)</span>
+            <h1 class="text-2xl md:text-4xl font-bold mb-3 drop-shadow-md">
+                รายงานผลการกำกับ ติดตาม<br>
+                <span class="text-xl md:text-3xl font-medium">ระบบคลังสื่อเทคโนโลยีดิจิทัล ระดับการศึกษาขั้นพื้นฐาน (OBEC Content Center)</span>
             </h1>
-            <div class="w-24 h-1 bg-green-300 mx-auto rounded mb-4"></div>
-            <h2 class="text-lg md:text-xl font-medium text-white tracking-wide">
-                สพป.ระยอง เขต 2 ประจำปีงบประมาณ พ.ศ. 2569
-            </h2>
+            <p class="text-lg md:text-xl text-obec-50 bg-black/20 inline-block px-6 py-2 rounded-full backdrop-blur-sm">
+                <i class="fa-solid fa-location-dot mr-2"></i> สพป.ระยอง เขต 2 ประจำปีงบประมาณ พ.ศ. 2569
+            </p>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 -mt-8 relative z-20">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20 mb-20">
         
-        <!-- Filter Controls -->
-        <div class="bg-white rounded-xl shadow-lg p-5 mb-8 flex flex-col md:flex-row gap-4 items-center justify-between border-t-4 border-green-500">
-            <div class="flex items-center gap-3">
-                <div class="bg-green-100 p-2 rounded-lg">
-                    <i class="fas fa-filter text-green-600"></i>
+        <!-- Filters Section -->
+        <section class="bg-white rounded-2xl shadow-md p-6 mb-8 border border-gray-100 flex flex-col md:flex-row gap-6 items-center justify-between">
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <div class="bg-obec-100 text-obec-600 p-3 rounded-lg">
+                    <i class="fa-solid fa-filter text-xl"></i>
                 </div>
-                <span class="font-bold text-gray-700 text-lg">ตัวกรองข้อมูล</span>
+                <div>
+                    <h3 class="font-semibold text-gray-700">ตัวกรองข้อมูล</h3>
+                    <p class="text-sm text-gray-500">เลือกดูข้อมูลตามระดับที่ต้องการ</p>
+                </div>
             </div>
-            <div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-                <div class="relative w-full sm:w-64">
-                    <select id="networkFilter" class="appearance-none w-full bg-gray-50 border border-gray-300 text-gray-700 py-2.5 px-4 pr-8 rounded-lg focus:outline-none focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 font-medium transition-colors" onchange="onNetworkChange()">
-                        <option value="all">ดูภาพรวมทุกเครือข่าย</option>
-                        <!-- Options populated via JS -->
+            
+            <div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto flex-1 md:justify-end">
+                <!-- Dropdown เครือข่าย -->
+                <div class="w-full sm:w-64">
+                    <label for="networkFilter" class="block text-sm font-medium text-gray-700 mb-1">ระดับเครือข่ายการศึกษา</label>
+                    <select id="networkFilter" class="w-full border border-gray-300 text-gray-700 rounded-lg focus:ring-obec-500 focus:border-obec-500 block p-2.5 outline-none transition-shadow">
+                        <option value="all">ภาพรวมทุกเครือข่าย</option>
+                        <!-- Options will be populated by JS -->
                     </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
-                        <i class="fas fa-chevron-down text-sm"></i>
-                    </div>
                 </div>
-                
-                <div class="relative w-full sm:w-72">
-                    <select id="schoolFilter" class="appearance-none w-full bg-gray-50 border border-gray-300 text-gray-700 py-2.5 px-4 pr-8 rounded-lg focus:outline-none focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 font-medium transition-colors" onchange="onSchoolChange()">
-                        <option value="all">ดูทุกโรงเรียน</option>
-                        <!-- Options populated via JS -->
+                <!-- Dropdown โรงเรียน -->
+                <div class="w-full sm:w-64">
+                    <label for="schoolFilter" class="block text-sm font-medium text-gray-700 mb-1">ระดับสถานศึกษา</label>
+                    <select id="schoolFilter" class="w-full border border-gray-300 text-gray-700 rounded-lg focus:ring-obec-500 focus:border-obec-500 block p-2.5 outline-none transition-shadow">
+                        <option value="all">ภาพรวมทุกโรงเรียน</option>
+                        <!-- Options will be populated by JS -->
                     </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
-                        <i class="fas fa-chevron-down text-sm"></i>
-                    </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- System Title based on Filter -->
-        <h3 id="dashboardTitle" class="text-xl font-bold text-gray-800 mb-6 border-l-4 border-green-500 pl-3">
-            ข้อมูลภาพรวม สพป.ระยอง เขต 2
-        </h3>
+        <!-- KPI Cards Section -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Card 1 -->
+            <div class="bg-white rounded-2xl shadow-sm p-6 border-l-4 border-blue-500 card-hover flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-500 mb-1">ผู้บริหารเข้าใช้งาน</p>
+                    <h3 class="text-3xl font-bold text-gray-800" id="kpi-admin">0</h3>
+                    <p class="text-xs text-gray-400 mt-1">คน</p>
+                </div>
+                <div class="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center text-blue-500">
+                    <i class="fa-solid fa-user-tie text-2xl"></i>
+                </div>
+            </div>
+            <!-- Card 2 -->
+            <div class="bg-white rounded-2xl shadow-sm p-6 border-l-4 border-green-500 card-hover flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-500 mb-1">ครูและบุคลากรเข้าใช้งาน</p>
+                    <h3 class="text-3xl font-bold text-gray-800" id="kpi-teacher">0</h3>
+                    <p class="text-xs text-gray-400 mt-1">คน</p>
+                </div>
+                <div class="w-14 h-14 bg-green-50 rounded-full flex items-center justify-center text-green-500">
+                    <i class="fa-solid fa-chalkboard-user text-2xl"></i>
+                </div>
+            </div>
+            <!-- Card 3 -->
+            <div class="bg-white rounded-2xl shadow-sm p-6 border-l-4 border-amber-500 card-hover flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-500 mb-1">ผู้สร้างสื่อดิจิทัล</p>
+                    <h3 class="text-3xl font-bold text-gray-800" id="kpi-creator">0</h3>
+                    <p class="text-xs text-gray-400 mt-1">คน</p>
+                </div>
+                <div class="w-14 h-14 bg-amber-50 rounded-full flex items-center justify-center text-amber-500">
+                    <i class="fa-solid fa-photo-film text-2xl"></i>
+                </div>
+            </div>
+            <!-- Card 4 -->
+            <div class="bg-white rounded-2xl shadow-sm p-6 border-l-4 border-purple-500 card-hover flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-500 mb-1">ผลงาน Best Practice รวม</p>
+                    <h3 class="text-3xl font-bold text-gray-800" id="kpi-bp">0</h3>
+                    <p class="text-xs text-gray-400 mt-1">ผลงาน</p>
+                </div>
+                <div class="w-14 h-14 bg-purple-50 rounded-full flex items-center justify-center text-purple-500">
+                    <i class="fa-solid fa-award text-2xl"></i>
+                </div>
+            </div>
+        </section>
 
-        <!-- KPI Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="card border-l-4 border-emerald-500 flex items-center justify-between">
-                <div>
-                    <p class="text-sm text-gray-500 font-semibold mb-1">ผู้บริหารเข้าใช้งาน</p>
-                    <div class="flex items-end gap-2">
-                        <p class="text-3xl font-bold text-gray-800" id="kpi-admin">0</p>
-                        <p class="text-sm font-medium text-gray-500 mb-1">คน</p>
-                    </div>
+        <!-- Charts Section -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Chart 1: Bar Chart -->
+            <div class="bg-white rounded-2xl shadow-sm p-6 lg:col-span-2">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800"><i class="fa-solid fa-chart-column text-obec-500 mr-2"></i> สัดส่วนผู้สร้างสื่อ และ ผู้ใช้สื่อดิจิทัล</h3>
+                    <span class="text-xs text-gray-500" id="barChartSubtitle">จำแนกตามเครือข่าย/โรงเรียน</span>
                 </div>
-                <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 shadow-sm"><i class="fas fa-user-tie text-xl"></i></div>
-            </div>
-            <div class="card border-l-4 border-blue-500 flex items-center justify-between">
-                <div>
-                    <p class="text-sm text-gray-500 font-semibold mb-1">ครูและบุคลากรเข้าใช้งาน</p>
-                    <div class="flex items-end gap-2">
-                        <p class="text-3xl font-bold text-gray-800" id="kpi-teacher">0</p>
-                        <p class="text-sm font-medium text-gray-500 mb-1">คน</p>
-                    </div>
+                <div class="relative h-[300px] md:h-[400px] w-full">
+                    <canvas id="barChart"></canvas>
                 </div>
-                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 shadow-sm"><i class="fas fa-chalkboard-teacher text-xl"></i></div>
             </div>
-            <div class="card border-l-4 border-orange-500 flex items-center justify-between">
-                <div>
-                    <p class="text-sm text-gray-500 font-semibold mb-1">ผลงานผู้สร้างสื่อ</p>
-                    <div class="flex items-end gap-2">
-                        <p class="text-3xl font-bold text-gray-800" id="kpi-creator">0</p>
-                        <p class="text-sm font-medium text-gray-500 mb-1">ชิ้น</p>
-                    </div>
-                </div>
-                <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 shadow-sm"><i class="fas fa-cloud-upload-alt text-xl"></i></div>
-            </div>
-            <div class="card border-l-4 border-purple-500 flex items-center justify-between">
-                <div>
-                    <p class="text-sm text-gray-500 font-semibold mb-1">ผู้ใช้สื่อการสอน</p>
-                    <div class="flex items-end gap-2">
-                        <p class="text-3xl font-bold text-gray-800" id="kpi-user">0</p>
-                        <p class="text-sm font-medium text-gray-500 mb-1">ครั้ง/คน</p>
-                    </div>
-                </div>
-                <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 shadow-sm"><i class="fas fa-laptop-house text-xl"></i></div>
-            </div>
-        </div>
 
-        <!-- Charts Area -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <!-- Chart 1: ผู้สร้าง vs ผู้ใช้สื่อ -->
-            <div class="card">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold text-gray-700">สัดส่วนผู้สร้างและผู้ใช้สื่อดิจิทัล</h3>
-                    <i class="fas fa-chart-bar text-gray-300"></i>
-                </div>
-                <div class="relative h-72">
-                    <canvas id="creatorUserChart"></canvas>
+            <!-- Chart 2: Doughnut Chart -->
+            <div class="bg-white rounded-2xl shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 text-center"><i class="fa-solid fa-medal text-amber-500 mr-2"></i> สถิติผลงาน Best Practice</h3>
+                <div class="relative h-[250px] w-full flex justify-center">
+                    <canvas id="doughnutChart"></canvas>
                 </div>
             </div>
-            <!-- Chart 2: Best Practice -->
-            <div class="card">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold text-gray-700">สถิติผลงาน Best Practice (ชิ้น)</h3>
-                    <i class="fas fa-chart-pie text-gray-300"></i>
-                </div>
-                <div class="relative h-72 flex justify-center">
-                    <canvas id="bpChart"></canvas>
+
+            <!-- Chart 3: Pie Chart -->
+            <div class="bg-white rounded-2xl shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 text-center"><i class="fa-solid fa-graduation-cap text-blue-500 mr-2"></i> ระดับการจัดการศึกษาที่นำไปใช้</h3>
+                <div class="relative h-[250px] w-full flex justify-center">
+                    <canvas id="pieChart"></canvas>
                 </div>
             </div>
-        </div>
-        
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <!-- Chart 3: ระดับการจัดการศึกษา -->
-            <div class="card lg:col-span-1">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold text-gray-700">ระดับชั้นที่นำไปใช้จัดการเรียนรู้</h3>
-                </div>
-                <div class="relative h-64 flex justify-center">
-                    <canvas id="levelChart"></canvas>
-                </div>
+        </section>
+
+        <!-- Data Table Section -->
+        <section class="bg-white rounded-2xl shadow-sm p-6 overflow-hidden">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4"><i class="fa-solid fa-table-list text-gray-500 mr-2"></i> ตารางสรุปข้อมูลรายละเอียด</h3>
+            <div class="overflow-x-auto rounded-xl border border-gray-200">
+                <table class="w-full text-sm text-left text-gray-500">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b">
+                        <tr>
+                            <th scope="col" class="px-6 py-4 rounded-tl-xl">โรงเรียน</th>
+                            <th scope="col" class="px-6 py-4">เครือข่าย</th>
+                            <th scope="col" class="px-6 py-4 text-right">ผู้บริหาร (คน)</th>
+                            <th scope="col" class="px-6 py-4 text-right">ครูผู้สอน (คน)</th>
+                            <th scope="col" class="px-6 py-4 text-right">ผู้สร้างสื่อ (คน)</th>
+                            <th scope="col" class="px-6 py-4 text-right rounded-tr-xl">ผู้ใช้สื่อ (คน)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Data will be populated by JS -->
+                    </tbody>
+                </table>
             </div>
-            <!-- Data Table (Summary) -->
-            <div class="card lg:col-span-2 overflow-hidden flex flex-col p-0">
-                <div class="p-5 border-b border-gray-100 bg-gray-50 rounded-t-xl flex justify-between items-center">
-                    <h3 class="text-lg font-bold text-gray-700">ตารางสรุปข้อมูล</h3>
-                    <span class="text-xs font-semibold bg-green-200 text-green-800 px-3 py-1 rounded-full" id="tableRowCount">0 รายการ</span>
-                </div>
-                <div class="overflow-x-auto flex-grow table-container p-2">
-                    <table class="min-w-full text-sm text-left">
-                        <thead class="text-xs text-gray-600 uppercase border-b-2 border-green-200">
-                            <tr>
-                                <th class="px-4 py-3 whitespace-nowrap">โรงเรียน</th>
-                                <th class="px-4 py-3 whitespace-nowrap">เครือข่าย</th>
-                                <th class="px-4 py-3 text-center whitespace-nowrap">ผู้บริหาร (คน)</th>
-                                <th class="px-4 py-3 text-center whitespace-nowrap">ครูผู้สอน (คน)</th>
-                                <th class="px-4 py-3 text-center whitespace-nowrap">สร้างสื่อ</th>
-                                <th class="px-4 py-3 text-center whitespace-nowrap">ใช้สื่อ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="dataTableBody" class="divide-y divide-gray-100">
-                            <!-- Populated via JS -->
-                        </tbody>
-                    </table>
-                </div>
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden text-center py-10">
+                <i class="fa-solid fa-folder-open text-4xl text-gray-300 mb-3"></i>
+                <p class="text-gray-500">ไม่พบข้อมูลในเงื่อนไขที่เลือก</p>
             </div>
-        </div>
+        </section>
 
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gradient-to-b from-[#114022] to-[#0a2614] text-white pt-12 pb-6 mt-12 border-t-4 border-green-400">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-8 relative">
-            <div>
-                <h3 class="text-xl font-bold mb-4 inline-block text-green-300">ติดต่อเรา</h3>
-                <p class="mb-1 font-semibold text-lg">งานสื่อ นวัตกรรม และเทคโนโลยีทางการศึกษา</p>
-                <p class="mb-1 text-gray-300">กลุ่มนิเทศ ติดตาม และประเมินผลการจัดการศึกษา</p>
-                <p class="mb-4 text-gray-300">สำนักงานเขตพื้นที่การศึกษาประถมศึกษาระยอง เขต 2</p>
+    <footer class="bg-gray-900 text-gray-300 py-10 mt-12 border-t-4 border-obec-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="col-span-1 md:col-span-2">
+                <div class="flex items-center gap-3 mb-4">
+                    <i class="fa-solid fa-circle-info text-obec-500 text-2xl"></i>
+                    <h3 class="text-xl font-semibold text-white">ติดต่อเรา</h3>
+                </div>
+                <p class="mb-2"><strong class="text-white">งาน:</strong> สื่อ นวัตกรรม และเทคโนโลยีทางการศึกษา</p>
+                <p class="mb-2"><strong class="text-white">กลุ่ม:</strong> นิเทศ ติดตาม และประเมินผลการจัดการศึกษา</p>
+                <p class="mb-4"><strong class="text-white">หน่วยงาน:</strong> สำนักงานเขตพื้นที่การศึกษาประถมศึกษาระยอง เขต 2</p>
+                <p class="text-sm text-gray-400">
+                    <i class="fa-solid fa-map-location-dot mr-2"></i> 99/1 หมู่ 3 ตำบลวังหว้า อำเภอแกลง จังหวัดระยอง 21110
+                </p>
             </div>
-            <div class="md:text-right flex flex-col justify-center">
-                <div class="bg-[#1a472a] p-4 rounded-xl shadow-inner border border-[#2a683e]">
-                    <p class="mb-3 text-sm md:text-base text-gray-200 flex items-start md:justify-end gap-3">
-                        <i class="fas fa-map-marker-alt text-green-400 mt-1"></i> 
-                        <span class="text-left md:text-right">99/1 หมู่ 3 ตำบลวังหว้า<br>อำเภอแกลง จังหวัดระยอง 21110</span>
-                    </p>
-                    <p class="mb-3 text-gray-200 flex items-center md:justify-end gap-3">
-                        <i class="fas fa-phone-alt text-green-400"></i> 
-                        <span class="font-mono">038-671-180</span>
-                    </p>
-                    <p class="text-gray-200 flex items-center md:justify-end gap-3">
-                        <i class="fas fa-envelope text-green-400"></i> 
-                        <a href="mailto:saraban04126@obec.go.th" class="hover:text-green-300 transition-colors font-mono">saraban04126@obec.go.th</a>
-                    </p>
+            <div class="flex flex-col justify-center">
+                <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
+                    <a href="tel:038671180" class="flex items-center gap-3 mb-4 hover:text-obec-400 transition-colors">
+                        <div class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center text-white">
+                            <i class="fa-solid fa-phone"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400">โทรศัพท์</p>
+                            <p class="font-medium text-white">038-671-180</p>
+                        </div>
+                    </a>
+                    <a href="mailto:saraban04126@obec.go.th" class="flex items-center gap-3 hover:text-obec-400 transition-colors">
+                        <div class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center text-white">
+                            <i class="fa-solid fa-envelope"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400">อีเมล</p>
+                            <p class="font-medium text-white break-all">saraban04126@obec.go.th</p>
+                        </div>
+                    </a>
                 </div>
             </div>
         </div>
-        <div class="max-w-7xl mx-auto px-4 mt-8 pt-6 border-t border-[#1f5933] text-center text-sm text-gray-400 flex flex-col md:flex-row justify-between items-center">
-            <p>&copy; 2569 สำนักงานเขตพื้นที่การศึกษาประถมศึกษาระยอง เขต 2. All rights reserved.</p>
-            <p class="mt-2 md:mt-0 text-xs">ระบบกำกับติดตาม OBEC Content Center Dashboard</p>
+        <div class="max-w-7xl mx-auto px-4 mt-8 pt-6 border-t border-gray-800 text-center text-sm text-gray-500">
+            &copy; 2026 OBEC Content Center Dashboard. All rights reserved.
         </div>
     </footer>
 
-    <!-- Application Script -->
-    <!-- เพิ่มไลบรารี PapaParse สำหรับอ่านไฟล์ CSV จาก Google Sheet -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <!-- JavaScript Logic -->
     <script>
-        // --- ส่วนที่ต้องแก้ไข ---
-        // นำลิงก์ CSV จาก "เผยแพร่ทางเว็บ" มาวางที่นี่
-        // ** ลิงก์ด้านล่างนี้เป็นลิงก์ตัวอย่าง ต้องเปลี่ยนเป็นลิงก์ของคุณเอง **
-        const SHEET_CSV_URL = "YOUR_PUBLISHED_CSV_LINK_HERE"; 
-        // -----------------------
+        // ==========================================
+        // 1. การตั้งค่าและตัวแปร (Configuration)
+        // ==========================================
+        
+        // กำหนด URL ของ Google Sheet ตามที่ระบุ
+        const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/12EIZqb6yHf0aYo5un6Mz3w-1aVaqju1ECk9qdta7FZE/edit?usp=sharing";
+        
+        // สร้าง URL สำหรับ Export เป็น CSV เพื่อให้ PapaParse อ่านได้
+        // แปลง /edit?usp=sharing เป็น /export?format=csv
+        const FETCH_URL = SHEET_CSV_URL.replace(/\/edit.*$/, '/export?format=csv');
 
+        // ตัวแปรเก็บข้อมูล
         let rawData = [];
-        let charts = {};
+        let filteredData = [];
+        
+        // Chart Instances
+        let chartBar, chartDoughnut, chartPie;
 
-        // Chart default configs
+        // ตั้งค่า Font เริ่มต้นสำหรับ Chart.js
         Chart.defaults.font.family = "'Prompt', sans-serif";
-        Chart.defaults.color = '#4b5563';
-        Chart.defaults.plugins.tooltip.padding = 12;
-        Chart.defaults.plugins.tooltip.cornerRadius = 8;
-        Chart.defaults.plugins.tooltip.titleFont = { size: 14, family: "'Prompt', sans-serif" };
+        Chart.defaults.color = '#64748b'; // slate-500
+        Chart.defaults.plugins.tooltip.titleFont = { family: "'Prompt', sans-serif", size: 14 };
+        Chart.defaults.plugins.tooltip.bodyFont = { family: "'Prompt', sans-serif", size: 13 };
 
-        function init() {
-            // แสดงข้อความกำลังโหลด
-            document.getElementById('dataTableBody').innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-spin mr-2"></i>กำลังดึงข้อมูลจากระบบ...</td></tr>';
-            
-            if (SHEET_CSV_URL === "YOUR_PUBLISHED_CSV_LINK_HERE") {
-                 document.getElementById('dataTableBody').innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-red-500 font-bold">กรุณาใส่ลิงก์ CSV ในโค้ดก่อนใช้งาน</td></tr>';
-                 return;
-            }
+        // ==========================================
+        // 2. ฟังก์ชันช่วยค้นหาคอลัมน์ (Helper Functions)
+        // ==========================================
+        // ป้องกันปัญหาเว้นวรรคผิดในชื่อคอลัมน์จาก Google Form
+        function getValueByKeyKeyword(row, keyword) {
+            const keys = Object.keys(row);
+            const foundKey = keys.find(k => k.includes(keyword));
+            return foundKey ? row[foundKey] : null;
+        }
 
-            // ดึงข้อมูลจาก Google Sheet แบบ CSV
-            Papa.parse(SHEET_CSV_URL, {
+        function parseNum(val) {
+            if (!val) return 0;
+            if (typeof val === 'number') return val;
+            const parsed = parseInt(val.toString().replace(/,/g, ''), 10);
+            return isNaN(parsed) ? 0 : parsed;
+        }
+
+        // โครงสร้างข้อมูลที่สกัดมาแล้ว (เพื่อความง่ายในการใช้งาน)
+        function extractCleanData(row) {
+            return {
+                school: getValueByKeyKeyword(row, 'โรงเรียน') || 'ไม่ระบุ',
+                network: getValueByKeyKeyword(row, 'เครือข่าย') || 'ไม่ระบุ',
+                level: getValueByKeyKeyword(row, 'ระดับการจัด') || '',
+                admin: parseNum(getValueByKeyKeyword(row, 'ผู้บริหารสถานศึกษา ที่เข้าใช้งาน')),
+                teacher: parseNum(getValueByKeyKeyword(row, 'ครูและบุคลากร')),
+                creator: parseNum(getValueByKeyKeyword(row, 'จำนวน ผู้สร้างสื่อ')),
+                user: parseNum(getValueByKeyKeyword(row, 'จำนวน ผู้ใช้สื่อ')),
+                bpCreator: parseNum(getValueByKeyKeyword(row, 'Best Practice  ผู้สร้างสื่อ')),
+                bpUser: parseNum(getValueByKeyKeyword(row, 'Best Practice  ผู้ใช้สื่อ')),
+                bpSchool: parseNum(getValueByKeyKeyword(row, 'Best Practice ผู้ขับเคลื่อน'))
+            };
+        }
+
+        // ==========================================
+        // 3. ฟังก์ชันหลักในการดึงข้อมูล (Fetch Data)
+        // ==========================================
+        function initApp() {
+            Papa.parse(FETCH_URL, {
                 download: true,
                 header: true,
                 skipEmptyLines: true,
                 complete: function(results) {
-                    processData(results.data);
-                },
-                error: function(err) {
-                    console.error("Error parsing CSV:", err);
-                    document.getElementById('dataTableBody').innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-red-500">เกิดข้อผิดพลาดในการดึงข้อมูล โปรดตรวจสอบลิงก์ CSV</td></tr>';
-                }
-            });
-        }
-
-        function processData(csvData) {
-            rawData = csvData.map(row => {
-                // แปลงข้อมูลจาก CSV ให้อยู่ในรูปแบบที่ระบบต้องการ
-                // สังเกตชื่อ Header ในวงเล็บสี่เหลี่ยม ต้องตรงกับใน Google Sheet ของคุณ
-                return {
-                    school: row["โรงเรียน"] || "ไม่ระบุ",
-                    network: row["เครือข่ายการศึกษา"] || "ไม่ระบุ",
-                    level: row["ระดับการจัดการศึกษา (ตอบได้มากกว่า 1 ข้อ) "] || "",
-                    admin_occ: parseInt(row["จำนวน  ผู้บริหารสถานศึกษา ที่เข้าใช้งาน OCC (ใส่เป็นตัวเลข)"]) || 0,
-                    teacher_occ: parseInt(row["จำนวน ครูและบุคลากรที่ปฏิบัติการสอน  ที่เข้าใช้งาน OCC (ใส่เป็นตัวเลข)"]) || 0,
-                    creator: parseInt(row["จำนวน ผู้สร้างสื่อฯ ลงในระบบ OCC (ใส่เป็นตัวเลข)"]) || 0,
-                    user: parseInt(row["จำนวน ผู้ใช้สื่อฯ จากระบบ OCC (ใส่เป็นตัวเลข)"]) || 0,
-                    bp_creator: parseInt(row["จำนวน Best Practice  ผู้สร้างสื่อฯ ของโรงเรียน (ใส่เป็นตัวเลข)"]) || 0,
-                    bp_user: parseInt(row["จำนวน Best Practice  ผู้ใช้สื่อฯ ของโรงเรียน (ใส่เป็นตัวเลข)"]) || 0,
-                    bp_school: parseInt(row["จำนวน Best Practice ผู้ขับเคลื่อนระบบ OCC ระดับสถานศึกษา (ใส่เป็นตัวเลข)"]) || 0
-                };
-            }).filter(d => d.school !== "ไม่ระบุ"); // กรองแถวที่ว่างออก
-
-            populateDropdowns();
-            renderDashboard(rawData, "all");
-        }
-
-        function populateDropdowns() {
-            // Networks
-            const networks = [...new Set(rawData.map(d => d.network))].sort();
-            const netSelect = document.getElementById('networkFilter');
-            networks.forEach(n => {
-                const opt = document.createElement('option');
-                opt.value = n;
-                opt.text = "เครือข่าย" + n;
-                netSelect.appendChild(opt);
-            });
-
-            // Schools
-            populateSchoolDropdown(rawData);
-        }
-
-        function populateSchoolDropdown(dataList) {
-            const schSelect = document.getElementById('schoolFilter');
-            // Keep the first option
-            schSelect.innerHTML = '<option value="all">ดูทุกโรงเรียน</option>';
-            
-            const schools = [...new Set(dataList.map(d => d.school))].sort();
-            schools.forEach(s => {
-                const opt = document.createElement('option');
-                opt.value = s;
-                opt.text = s;
-                schSelect.appendChild(opt);
-            });
-        }
-
-        function onNetworkChange() {
-            const netVal = document.getElementById('networkFilter').value;
-            const schSelect = document.getElementById('schoolFilter');
-            schSelect.value = "all"; // Reset school filter
-
-            let filtered = rawData;
-            let levelTitle = "ภาพรวม สพป.ระยอง เขต 2";
-
-            if (netVal !== "all") {
-                filtered = rawData.filter(d => d.network === netVal);
-                levelTitle = "เครือข่ายการศึกษา" + netVal;
-            }
-            
-            // Update school dropdown to show only schools in this network
-            populateSchoolDropdown(netVal === "all" ? rawData : filtered);
-            
-            renderDashboard(filtered, "network", levelTitle);
-        }
-
-        function onSchoolChange() {
-            const schVal = document.getElementById('schoolFilter').value;
-            const netSelect = document.getElementById('networkFilter');
-            
-            let filtered = rawData;
-            let levelTitle = "ภาพรวม สพป.ระยอง เขต 2";
-
-            if (schVal !== "all") {
-                filtered = rawData.filter(d => d.school === schVal);
-                levelTitle = schVal;
-                
-                // Auto set network dropdown
-                if(filtered.length > 0) {
-                    netSelect.value = filtered[0].network;
-                }
-            } else {
-                // If reset to all, trigger network change instead
-                onNetworkChange();
-                return;
-            }
-            
-            renderDashboard(filtered, "school", levelTitle);
-        }
-
-        function renderDashboard(data, viewType, titleText = "ภาพรวม สพป.ระยอง เขต 2") {
-            // Update Title
-            document.getElementById('dashboardTitle').innerText = titleText;
-            document.getElementById('tableRowCount').innerText = data.length + " โรงเรียน";
-
-            // 1. Calculate KPIs
-            const kpiAdmin = data.reduce((sum, d) => sum + (d.admin_occ || 0), 0);
-            const kpiTeacher = data.reduce((sum, d) => sum + (d.teacher_occ || 0), 0);
-            const kpiCreator = data.reduce((sum, d) => sum + (d.creator || 0), 0);
-            const kpiUser = data.reduce((sum, d) => sum + (d.user || 0), 0);
-
-            // Animate Numbers (Simple replace for this example)
-            document.getElementById('kpi-admin').innerText = kpiAdmin.toLocaleString();
-            document.getElementById('kpi-teacher').innerText = kpiTeacher.toLocaleString();
-            document.getElementById('kpi-creator').innerText = kpiCreator.toLocaleString();
-            document.getElementById('kpi-user').innerText = kpiUser.toLocaleString();
-
-            // 2. Prepare Chart Data
-            let labels = [];
-            let creators = [];
-            let users = [];
-
-            // Aggregation logic based on viewType
-            if (viewType === "network" && data.length === rawData.length) {
-                // Show Network level
-                const netGroup = {};
-                data.forEach(d => {
-                    if (!netGroup[d.network]) netGroup[d.network] = { c: 0, u: 0 };
-                    netGroup[d.network].c += d.creator;
-                    netGroup[d.network].u += d.user;
-                });
-                for (const [key, val] of Object.entries(netGroup)) {
-                    labels.push(key);
-                    creators.push(val.c);
-                    users.push(val.u);
-                }
-            } else {
-                // Show School level (max 15 on chart to avoid crowding)
-                const chartData = data.slice(0, 15);
-                chartData.forEach(d => {
-                    // Shorten name for chart
-                    labels.push(d.school.replace("โรงเรียน", ""));
-                    creators.push(d.creator);
-                    users.push(d.user);
-                });
-            }
-
-            // Chart 1: Creator vs User Bar Chart
-            if(charts.cu) charts.cu.destroy();
-            const ctxCU = document.getElementById('creatorUserChart').getContext('2d');
-            charts.cu = new Chart(ctxCU, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        { label: 'ผู้สร้างสื่อ', data: creators, backgroundColor: '#22c55e', borderRadius: 4, maxBarThickness: 40 },
-                        { label: 'ผู้ใช้สื่อ', data: users, backgroundColor: '#3b82f6', borderRadius: 4, maxBarThickness: 40 }
-                    ]
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { position: 'top', align: 'end', labels: { boxWidth: 12, usePointStyle: true } }
-                    },
-                    scales: {
-                        y: { beginAtZero: true, grid: { borderDash: [2, 4], color: '#e5e7eb' } },
-                        x: { grid: { display: false } }
+                    if (results.errors.length > 0) {
+                        console.error("PapaParse Errors:", results.errors);
                     }
+                    
+                    // แปลงข้อมูลให้อยู่ในรูปแบบที่พร้อมใช้งาน
+                    rawData = results.data.map(extractCleanData);
+                    
+                    // หากไม่มีข้อมูล (เช่น ลิงก์ไม่ถูกต้อง หรือยังไม่มีคนกรอก)
+                    if(rawData.length === 0) {
+                        alert("ไม่พบข้อมูล หรือไม่สามารถเข้าถึง Google Sheet ได้ โปรดตรวจสอบการแชร์ลิงก์ให้เป็น 'Anyone with the link can view'");
+                        document.getElementById('loading-overlay').style.display = 'none';
+                        return;
+                    }
+
+                    filteredData = [...rawData];
+                    
+                    setupFilters();
+                    updateDashboard();
+                    
+                    // ปิดหน้าจอโหลด
+                    document.getElementById('loading-overlay').style.display = 'none';
+                },
+                error: function(error) {
+                    console.error("Error fetching CSV:", error);
+                    alert("เกิดข้อผิดพลาดในการดึงข้อมูล: " + error.message);
+                    document.getElementById('loading-overlay').style.display = 'none';
                 }
             });
+        }
 
-            // Chart 2: Best Practice Doughnut
-            const bpC = data.reduce((sum, d) => sum + (d.bp_creator || 0), 0);
-            const bpU = data.reduce((sum, d) => sum + (d.bp_user || 0), 0);
-            const bpS = data.reduce((sum, d) => sum + (d.bp_school || 0), 0);
+        // ==========================================
+        // 4. ระบบตัวกรอง (Filters)
+        // ==========================================
+        const elNetworkFilter = document.getElementById('networkFilter');
+        const elSchoolFilter = document.getElementById('schoolFilter');
+
+        function setupFilters() {
+            // ดึงชื่อเครือข่ายทั้งหมด (ไม่ซ้ำ)
+            const networks = [...new Set(rawData.map(item => item.network))].filter(n => n !== 'ไม่ระบุ').sort();
             
-            if(charts.bp) charts.bp.destroy();
-            const ctxBP = document.getElementById('bpChart').getContext('2d');
-            charts.bp = new Chart(ctxBP, {
-                type: 'doughnut',
-                data: {
-                    labels: ['ครูผู้สร้างสื่อ', 'ครูผู้ใช้สื่อ', 'สถานศึกษา (ขับเคลื่อน)'],
-                    datasets: [{
-                        data: [bpC, bpU, bpS],
-                        backgroundColor: ['#f97316', '#a855f7', '#eab308'],
-                        borderWidth: 2,
-                        borderColor: '#ffffff',
-                        hoverOffset: 4
-                    }]
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { position: 'right', labels: { boxWidth: 12, usePointStyle: true, font:{size:13} } }
-                    }, 
-                    cutout: '65%' 
-                }
+            // ใส่ Option ให้ Dropdown เครือข่าย
+            networks.forEach(net => {
+                const option = document.createElement('option');
+                option.value = net;
+                option.textContent = net;
+                elNetworkFilter.appendChild(option);
             });
 
-            // Chart 3: Education Levels Pie Chart
-            let lEarly = 0, lPri = 0, lSec = 0;
-            data.forEach(d => {
-                if(d.level.includes("ปฐมวัย")) lEarly++;
-                if(d.level.includes("ประถมศึกษา")) lPri++;
-                if(d.level.includes("มัธยมศึกษาตอนต้น")) lSec++;
+            // ดึงชื่อโรงเรียนทั้งหมด
+            updateSchoolFilterOptions();
+
+            // Event Listeners
+            elNetworkFilter.addEventListener('change', handleFilterChange);
+            elSchoolFilter.addEventListener('change', handleSchoolChange);
+        }
+
+        function updateSchoolFilterOptions() {
+            const selectedNetwork = elNetworkFilter.value;
+            
+            // ล้าง option เก่า ยกเว้น "ภาพรวม"
+            elSchoolFilter.innerHTML = '<option value="all">ภาพรวมทุกโรงเรียน</option>';
+            
+            // กรองโรงเรียนตามเครือข่ายที่เลือก
+            let schools = [];
+            if (selectedNetwork === 'all') {
+                schools = [...new Set(rawData.map(item => item.school))].sort();
+            } else {
+                schools = [...new Set(rawData.filter(item => item.network === selectedNetwork).map(item => item.school))].sort();
+            }
+
+            schools.forEach(school => {
+                const option = document.createElement('option');
+                option.value = school;
+                option.textContent = school;
+                elSchoolFilter.appendChild(option);
+            });
+        }
+
+        function handleFilterChange() {
+            const selectedNetwork = elNetworkFilter.value;
+            
+            // อัปเดต Dropdown โรงเรียนให้สัมพันธ์กัน
+            updateSchoolFilterOptions();
+            
+            // รีเซ็ตโรงเรียนเป็น "ภาพรวม"
+            elSchoolFilter.value = 'all';
+            
+            applyFilters();
+        }
+
+        function handleSchoolChange() {
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const selectedNetwork = elNetworkFilter.value;
+            const selectedSchool = elSchoolFilter.value;
+
+            filteredData = rawData.filter(item => {
+                const matchNetwork = selectedNetwork === 'all' || item.network === selectedNetwork;
+                const matchSchool = selectedSchool === 'all' || item.school === selectedSchool;
+                return matchNetwork && matchSchool;
             });
 
-            if(charts.lvl) charts.lvl.destroy();
-            const ctxLvl = document.getElementById('levelChart').getContext('2d');
-            charts.lvl = new Chart(ctxLvl, {
-                type: 'pie',
-                data: {
-                    labels: ['ปฐมวัย', 'ประถมศึกษา', 'มัธยมศึกษาตอนต้น'],
-                    datasets: [{
-                        data: [lEarly, lPri, lSec],
-                        backgroundColor: ['#f472b6', '#14b8a6', '#6366f1'],
-                        borderWidth: 2,
-                        borderColor: '#ffffff',
-                        hoverOffset: 4
-                    }]
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { position: 'bottom', labels: { boxWidth: 12, usePointStyle: true } }
-                    } 
-                }
-            });
+            updateDashboard();
+        }
 
-            // 3. Update Data Table
-            const tbody = document.getElementById('dataTableBody');
+        // ==========================================
+        // 5. อัปเดตการแสดงผล (Update UI)
+        // ==========================================
+        function updateDashboard() {
+            updateKPIs();
+            renderTable();
+            renderCharts();
+        }
+
+        function updateKPIs() {
+            // คำนวณผลรวม
+            const totalAdmin = filteredData.reduce((sum, item) => sum + item.admin, 0);
+            const totalTeacher = filteredData.reduce((sum, item) => sum + item.teacher, 0);
+            const totalCreator = filteredData.reduce((sum, item) => sum + item.creator, 0);
+            const totalBp = filteredData.reduce((sum, item) => sum + item.bpCreator + item.bpUser + item.bpSchool, 0);
+
+            // Animate ตัวเลข (อย่างง่าย)
+            document.getElementById('kpi-admin').textContent = totalAdmin.toLocaleString();
+            document.getElementById('kpi-teacher').textContent = totalTeacher.toLocaleString();
+            document.getElementById('kpi-creator').textContent = totalCreator.toLocaleString();
+            document.getElementById('kpi-bp').textContent = totalBp.toLocaleString();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const emptyState = document.getElementById('emptyState');
+            
             tbody.innerHTML = '';
             
-            if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-500">ไม่พบข้อมูล</td></tr>';
+            if (filteredData.length === 0) {
+                emptyState.classList.remove('hidden');
                 return;
+            } else {
+                emptyState.classList.add('hidden');
             }
 
-            // Sort data by school name before displaying
-            const sortedData = [...data].sort((a,b) => a.school.localeCompare(b.school, 'th'));
-            
-            sortedData.forEach(d => {
+            filteredData.forEach(item => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-green-50/50 transition-colors duration-150";
+                tr.className = 'bg-white border-b hover:bg-gray-50 transition-colors';
                 tr.innerHTML = `
-                    <td class="px-4 py-3 font-medium text-gray-800 whitespace-nowrap">${d.school}</td>
-                    <td class="px-4 py-3 text-sm text-gray-600 whitespace-nowrap"><span class="bg-gray-100 px-2 py-1 rounded-md text-xs">${d.network}</span></td>
-                    <td class="px-4 py-3 text-center text-gray-700">${d.admin_occ}</td>
-                    <td class="px-4 py-3 text-center text-gray-700">${d.teacher_occ}</td>
-                    <td class="px-4 py-3 text-center text-green-600 font-semibold">${d.creator}</td>
-                    <td class="px-4 py-3 text-center text-blue-600 font-semibold">${d.user}</td>
+                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">${item.school}</td>
+                    <td class="px-6 py-4">${item.network}</td>
+                    <td class="px-6 py-4 text-right">${item.admin.toLocaleString()}</td>
+                    <td class="px-6 py-4 text-right">${item.teacher.toLocaleString()}</td>
+                    <td class="px-6 py-4 text-right font-medium text-amber-600">${item.creator.toLocaleString()}</td>
+                    <td class="px-6 py-4 text-right font-medium text-blue-600">${item.user.toLocaleString()}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        // Initialize on load
-        window.onload = init;
+        // ==========================================
+        // 6. จัดการกราฟ (Charts)
+        // ==========================================
+        function renderCharts() {
+            renderBarChart();
+            renderDoughnutChart();
+            renderPieChart();
+        }
+
+        function renderBarChart() {
+            const ctx = document.getElementById('barChart').getContext('2d');
+            
+            // กำหนด Label แกน X ตามเงื่อนไข Filter
+            let labels = [];
+            let creatorData = [];
+            let userData = [];
+            let chartSubtitle = "";
+
+            const selectedNetwork = elNetworkFilter.value;
+            const selectedSchool = elSchoolFilter.value;
+
+            if (selectedSchool !== 'all') {
+                // ระดับโรงเรียน: แสดง 1 แท่ง
+                labels = [selectedSchool];
+                creatorData = [filteredData[0].creator];
+                userData = [filteredData[0].user];
+                chartSubtitle = "ข้อมูลรายสถานศึกษา";
+            } else if (selectedNetwork !== 'all') {
+                // ระดับเครือข่าย: แสดงแยกตามโรงเรียนในเครือข่าย
+                const grouped = aggregateDataByKey(filteredData, 'school');
+                labels = Object.keys(grouped);
+                creatorData = labels.map(l => grouped[l].creator);
+                userData = labels.map(l => grouped[l].user);
+                chartSubtitle = `จำแนกตามโรงเรียน (เครือข่าย: ${selectedNetwork})`;
+            } else {
+                // ภาพรวม: แสดงแยกตามเครือข่าย
+                const grouped = aggregateDataByKey(filteredData, 'network');
+                labels = Object.keys(grouped);
+                creatorData = labels.map(l => grouped[l].creator);
+                userData = labels.map(l => grouped[l].user);
+                chartSubtitle = "จำแนกตามเครือข่ายการศึกษา";
+            }
+
+            document.getElementById('barChartSubtitle').textContent = chartSubtitle;
+
+            const config = {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'ผู้สร้างสื่อ',
+                            data: creatorData,
+                            backgroundColor: '#fbbf24', // amber-400
+                            borderRadius: 4,
+                        },
+                        {
+                            label: 'ผู้ใช้สื่อ',
+                            data: userData,
+                            backgroundColor: '#3b82f6', // blue-500
+                            borderRadius: 4,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { precision: 0 } },
+                        x: {
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 0,
+                                callback: function(value) {
+                                    // ตัดคำถ้ายาวไป
+                                    const label = this.getLabelForValue(value);
+                                    return label.length > 15 ? label.substr(0, 15) + '...' : label;
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            if (chartBar) chartBar.destroy();
+            chartBar = new Chart(ctx, config);
+        }
+
+        function renderDoughnutChart() {
+            const ctx = document.getElementById('doughnutChart').getContext('2d');
+            
+            const sumBpCreator = filteredData.reduce((s, i) => s + i.bpCreator, 0);
+            const sumBpUser = filteredData.reduce((s, i) => s + i.bpUser, 0);
+            const sumBpSchool = filteredData.reduce((s, i) => s + i.bpSchool, 0);
+
+            const config = {
+                type: 'doughnut',
+                data: {
+                    labels: ['ผู้สร้างสื่อฯ', 'ผู้ใช้สื่อฯ', 'สถานศึกษา (ขับเคลื่อน)'],
+                    datasets: [{
+                        data: [sumBpCreator, sumBpUser, sumBpSchool],
+                        backgroundColor: ['#22c55e', '#3b82f6', '#a855f7'], // green, blue, purple
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '65%',
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            };
+
+            if (chartDoughnut) chartDoughnut.destroy();
+            chartDoughnut = new Chart(ctx, config);
+        }
+
+        function renderPieChart() {
+            const ctx = document.getElementById('pieChart').getContext('2d');
+            
+            // ประมวลผลข้อมูล "ระดับการจัดการศึกษา" ซึ่งอาจตอบมาหลายข้อ
+            let levelCounts = { 'ปฐมวัย': 0, 'ประถมศึกษา': 0, 'มัธยมศึกษาตอนต้น': 0, 'อื่นๆ': 0 };
+            
+            filteredData.forEach(item => {
+                if (item.level) {
+                    const str = item.level.toString();
+                    if (str.includes('ปฐมวัย')) levelCounts['ปฐมวัย']++;
+                    if (str.includes('ประถม')) levelCounts['ประถมศึกษา']++;
+                    if (str.includes('มัธยม')) levelCounts['มัธยมศึกษาตอนต้น']++;
+                    // เพิ่มเติมกรณีมีระดับอื่น
+                }
+            });
+
+            const config = {
+                type: 'pie',
+                data: {
+                    labels: ['ปฐมวัย', 'ประถมศึกษา', 'มัธยมศึกษาตอนต้น'],
+                    datasets: [{
+                        data: [levelCounts['ปฐมวัย'], levelCounts['ประถมศึกษา'], levelCounts['มัธยมศึกษาตอนต้น']],
+                        backgroundColor: ['#f472b6', '#4ade80', '#fb923c'], // pink, green, orange
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            };
+
+            if (chartPie) chartPie.destroy();
+            chartPie = new Chart(ctx, config);
+        }
+
+        // ฟังก์ชันช่วยจัดกลุ่มข้อมูลสำหรับกราฟแท่ง
+        function aggregateDataByKey(data, key) {
+            return data.reduce((acc, curr) => {
+                const group = curr[key];
+                if (!acc[group]) {
+                    acc[group] = { creator: 0, user: 0 };
+                }
+                acc[group].creator += curr.creator;
+                acc[group].user += curr.user;
+                return acc;
+            }, {});
+        }
+
+        // เริ่มต้นการทำงานเมื่อโหลดหน้าเสร็จ
+        window.addEventListener('DOMContentLoaded', initApp);
+
     </script>
 </body>
 </html>
